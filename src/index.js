@@ -57,17 +57,16 @@ const app = () => {
   };
 
   const updater = () => {
-    console.log('update');
     state.addedUrls.map((url) => {
       axios({
         method: 'get',
-        url: `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}`,
+        url: `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`,
       }).then((response) => {
         const parsedRss = xmlParse(response.data.contents);
-        const posts = parsedRss.querySelectorAll('item');
         if (parsedRss.querySelector('parsererror') !== null) {
           return;
         }
+        const posts = parsedRss.querySelectorAll('item');
         getPosts(posts);
       });
       return 1;
