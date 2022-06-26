@@ -1,12 +1,15 @@
 import i18next from 'i18next';
 
-export default (path, value, form) => {
+export default (path, value) => {
   const inputField = document.querySelector('#url-input');
   const feedback = document.querySelector('.feedback');
   const feedsHeader = document.querySelector('#feeds-header');
   const ulForFeeds = document.querySelector('#feeds-list');
   const postsHeader = document.querySelector('#posts-header');
   const ulForPosts = document.querySelector('#posts-list');
+  const modalHeader = document.querySelector('.modal-title');
+  const modalBody = document.querySelector('.modal-body');
+  const modalFooterButton = document.querySelector('.full-article');
 
   if (path === 'error') {
     inputField.classList.add('is-invalid');
@@ -31,6 +34,13 @@ export default (path, value, form) => {
     pForDescription.classList.add('m-0', 'small', 'text-black-50');
     pForDescription.textContent = value.description;
     liForFeed.append(pForDescription);
+
+    inputField.classList.remove('is-invalid');
+    feedback.classList.remove('text-danger');
+    feedback.classList.add('text-success');
+    feedback.textContent = i18next.t('successMessage');
+    inputField.value = '';
+    inputField.focus();
   }
   if (path === 'posts') {
     if (value[0].feedId === 1) {
@@ -48,6 +58,10 @@ export default (path, value, form) => {
       aElementForPost.dataset.id = i;
       aElementForPost.classList.add('fw-bold');
       aElementForPost.textContent = post.name;
+      aElementForPost.addEventListener('click', (e) => {
+        e.target.classList.remove('fw-bold');
+        e.target.classList.add('fw-normal', 'link-secondary');
+      });
 
       const buttonForPost = document.createElement('button');
       buttonForPost.setAttribute('type', 'button');
@@ -63,12 +77,14 @@ export default (path, value, form) => {
       return liForPost;
     });
   }
-  if (path === 'input') {
-    inputField.classList.remove('is-invalid');
-    feedback.classList.remove('text-danger');
-    feedback.classList.add('text-success');
-    feedback.textContent = i18next.t('successMessage');
-    form.reset();
-    inputField.focus();
+  if (path === 'modal') {
+    modalHeader.textContent = value.name;
+    modalBody.textContent = value.description;
+    modalFooterButton.href = value.link;
+  }
+  if (path === 'ui.viewingPost') {
+    const viewingPost = document.querySelector(`a[data-id="${value}"]`);
+    viewingPost.classList.remove('fw-bold');
+    viewingPost.classList.add('fw-normal', 'link-secondary');
   }
 };

@@ -9,12 +9,15 @@ import ru from './locale.js';
 
 const app = () => {
   const state = {
-    input: '',
     error: '',
     feed: '',
     posts: '',
     addedUrls: [],
     addedPosts: [],
+    modal: '',
+    ui: {
+      viewingPost: '',
+    },
   };
 
   i18next.init({
@@ -26,9 +29,10 @@ const app = () => {
   });
 
   const form = document.querySelector('form');
+  const modal = document.querySelector('#modal');
 
   const watchedState = onChange(state, (path, value) => {
-    render(path, value, form);
+    render(path, value);
   });
 
   const xmlParse = (xml) => {
@@ -44,6 +48,7 @@ const app = () => {
         description: post.querySelector('description').textContent,
         link: post.querySelector('link').textContent,
         id: state.addedPosts.length + 1,
+        feedId: state.addedUrls.length + 1,
       };
       const namesOfAddedPosts = state.addedPosts.map((addedPost) => addedPost.name);
       if (!namesOfAddedPosts.includes(postData.name)) {
@@ -57,6 +62,7 @@ const app = () => {
   };
 
   const updater = () => {
+    console.log('update');
     state.addedUrls.map((url) => {
       axios({
         method: 'get',
@@ -92,7 +98,6 @@ const app = () => {
           watchedState.error = i18next.t('notValidRss');
           return;
         }
-        watchedState.input = currentValue;
         const channelName = parsedRss.querySelector('channel > title').textContent;
         const channelDescription = parsedRss.querySelector('channel > description').textContent;
         const feed = {
@@ -113,6 +118,13 @@ const app = () => {
         watchedState.error = err.errors;
       });
   });
+
+  modal.addEventListener('show.bs.modal', (e) => {
+    const post = state.addedPosts.filter((i) => i.id.toString() === e.relatedTarget.dataset.id)[0];
+    watchedState.modal = post;
+    watchedState.ui.viewingPost = post.id;
+  });
+
   window.setTimeout(updater, 5000);
 };
 
