@@ -37,9 +37,10 @@ const config = {
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
         type: 'asset',
+        assetModuleFilename: 'assets/[hash][ext][query]',
       },
       {
-        test: /\.(sa|sc|c)ss&/,
+        test: /\.(sa|sc|c)ss$/,
         use: [
           MiniCssExtractPlugin.loader,
           'css-loader',
